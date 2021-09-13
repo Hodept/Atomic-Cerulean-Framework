@@ -52,6 +52,14 @@ ADMon and LDAP Mon
 | 198.19.64.18  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r24-u1          | inventory.example.device | us-example-1 | utility | example.example.example.example-rack20-utility1     |
 | 198.18.128.87 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r24             | inventory.example.device | us-example-1 | tor     | example.example.example.example-rack20-tor1         |
 
+----------------------------------
+
+| rest /services/data/indexes | where disabled = 0 | search NOT title = "_*" | eval currentDBSizeGB = round( currentDBSizeMB / 1024) | where currentDBSizeGB > 0 | table splunk_server title summaryHomePath_expanded minTime maxTime currentDBSizeGB totalEventCount frozenTimePeriodInSecs coldToFrozenDir maxTotalDataSizeMB | rename minTime AS earliest maxTime AS latest summaryHomePath_expanded AS index_path currentDBSizeGB AS index_size totalEventCount AS event_cnt frozenTimePeriodInSecs AS index_retention coldToFrozenDir AS index_path_frozen maxTotalDataSizeMB AS index_size_max title AS index
+
+
+
+
+------------------------------------
 
 
 Identities look up 
