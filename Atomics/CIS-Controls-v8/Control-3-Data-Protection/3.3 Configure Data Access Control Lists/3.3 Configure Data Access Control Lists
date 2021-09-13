@@ -1,0 +1,82 @@
+# CIS Control 3 - Data Protection
+
+## [CIS Controls v8 - (153)]([CIS Controls Navigator](https://www.cisecurity.org/controls/cis-controls-navigator/))
+
+> Develop processes and technical controls to identify, classify, securely handle, retain, and dispose of data.
+
+## 3.4 [Enforce Data Retention](https://www.cisecurity.org/controls/cis-controls-navigator/#collapse-a16)
+
+> Retain data according to the enterprise's data management process. Data retention must include both minimum and maximum timelines.
+
+## Atomic Tests
+
+- Atomic Test #1 - Splunk Data Retention Policy
+
+## Atomic Test #1 - Splunk Data Retention Policy
+
+### Description
+
+The indexer stores indexed data in directories called **[buckets](https://docs.splunk.com/Splexicon:Bucket "Splexicon:Bucket")**. Buckets go through four stages of retirement. When indexed data reaches the final, frozen state, the indexer removes it from the index. You can configure the indexer to archive the data when it freezes, instead of deleting it entirely. See ["Archive indexed data"](http://docs.splunk.com/Documentation/Splunk/8.2.2/Indexer/Automatearchiving) for details.
+
+You can use the age of data to determine when a bucket gets rolled to frozen. When the most recent data in a particular bucket reaches the configured age, the entire bucket is rolled.
+
+#### **Supported Platforms:** Splunk
+
+#### Evidence Commands: Run with SPL [(**Splunk's Search Processing Language**)]((https://www.splunk.com/en_us/resources/search-processing-language.html))
+
+```SPL
+| rest /services/data/indexes 
+| where disabled = 0 
+| search NOT title = "_*" 
+| eval currentDBSizeGB = round( currentDBSizeMB / 1024) 
+| where currentDBSizeGB > 0 
+| table splunk_server title summaryHomePath_expanded minTime maxTime currentDBSizeGB totalEventCount frozenTimePeriodInSecs coldToFrozenDir maxTotalDataSizeMB 
+| rename minTime AS earliest maxTime AS latest summaryHomePath_expanded AS index_path currentDBSizeGB AS index_size totalEventCount AS event_cnt frozenTimePeriodInSecs AS index_retention coldToFrozenDir AS index_path_frozen maxTotalDataSizeMB AS index_size_max title AS index
+```
+
+## Example Output
+
+**<u>Disclaimer:</u>** This example output should be reviewed as a means to understand what the body of evidence auditors would expect to see when reviewing a control.   This example should be viewed through such lense and NOT as an example of what will be accepted by all auditors in every circumstance.  
+
+| Testing-test_server                                          | index                 | index_path                                                                                     | earliest                 | latest                   | index_size | event_cnt   | index_retention | index_path_frozen                                     | index_size_max |
+| ------------------------------------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------- | ------------------------ | ------------------------ | ---------- | ----------- | --------------- | ----------------------------------------------------- | -------------- |
+| siem-Testing-test-indexer-01320.node.ad1.us-example-domain-1 | aaa                   | /opt/Testing-test/var/lib/Testing-test_example/exampledb/aaa/summary                           | 2020-08-07T03:08:07+0000 | 2021-09-13T21:00:41+0000 | 24         | 204610027   | 7776000         | /opt/Testing-test/var/lib/Testing-test_example/frozen | 1000000        |
+| siem-Testing-test-indexer-01320.node.ad1.us-example-domain-1 | application_api       | /opt/Testing-test/var/lib/Testing-test_example/exampledb/application_api/summary               | 2021-07-07T21:54:57+0000 | 2021-09-13T21:00:49+0000 | 27         | 159524970   | 7776000         | /opt/Testing-test/var/lib/Testing-test_example/frozen | 100000         |
+| siem-Testing-test-indexer-01320.node.ad1.us-example-domain-1 | application_debug     | /opt/Testing-test/var/lib/Testing-test_example/exampledb/application_debug/summary             | 2021-07-28T22:44:04+0000 | 2021-09-13T22:48:34+0000 | 97         | 828276223   | 7776000         | /opt/Testing-test/var/lib/Testing-test_example/frozen | 100000         |
+| siem-Testing-test-indexer-01320.node.ad1.us-example-domain-1 | auditd                | /opt/Testing-test/var/lib/Testing-test_example/Testing-test_warm/auditd/summary                | 2019-10-18T09:04:00+0000 | 2021-09-13T21:01:52+0000 | 31         | 355852251   | 7776000         | /opt/Testing-test/var/lib/Testing-test_example/frozen | 25819000       |
+| siem-Testing-test-indexer-01320.node.ad1.us-example-domain-1 | auditd_authentication | /opt/Testing-test/var/lib/Testing-test_example/Testing-test_warm/auditd_authentication/summary | 2021-06-15T22:52:48+0000 | 2021-09-13T21:01:58+0000 | 83         | 615578034   | 7776000         | /opt/Testing-test/var/lib/Testing-test_example/frozen | 25819000       |
+| siem-Testing-test-indexer-01320.node.ad1.us-example-domain-1 | auditd_syscall        | /opt/Testing-test/var/lib/Testing-test_example/Testing-test_warm/auditd_syscall/summary        | 2021-06-25T23:58:51+0000 | 2021-09-13T21:01:57+0000 | 1358       | 11599612500 | 7776000         | /opt/Testing-test/var/lib/Testing-test_example/frozen | 25819000       |
+| siem-Testing-test-indexer-01320.node.ad1.us-example-domain-1 | cavium                | /opt/Testing-test/var/lib/Testing-test_example/exampledb/cavium/summary                        | 2021-01-01T00:00:02+0000 | 2021-09-13T20:06:49+0000 | 10         | 162468270   | 7776000         | /opt/Testing-test/var/lib/Testing-test_example/frozen | 500000         |
+| siem-Testing-test-indexer-01320.node.ad1.us-example-domain-1 | chef                  | /opt/Testing-test/var/lib/Testing-test_example/Testing-test_warm/chef/summary                  | 2021-06-17T21:50:43+0000 | 2021-09-13T21:01:35+0000 | 15         | 59015557    | 7776000         | /opt/Testing-test/var/lib/Testing-test_example/frozen | 100000         |
+| siem-Testing-test-indexer-01320.node.ad1.us-example-domain-1 | databases             | /opt/Testing-test/var/lib/Testing-test_example/exampledb/databases/summary                     | 2021-05-11T22:12:13+0000 | 2021-09-11T18:58:24+0000 | 1          | 7147154     | 7776000         | /opt/Testing-test/var/lib/Testing-test_example/frozen | 100000         |
+| siem-Testing-test-indexer-01320.node.ad1.us-example-domain-1 | fim                   | /opt/Testing-test/var/lib/Testing-test_example/Testing-test_warm/fim/summary                   | 2021-06-17T21:57:48+0000 | 2021-09-13T20:20:38+0000 | 1          | 6585225     | 7776000         | /opt/Testing-test/var/lib/Testing-test_example/frozen | 500000         |
+| siem-Testing-test-indexer-01320.node.ad1.us-example-domain-1 | idp                   | /opt/Testing-test/var/lib/Testing-test_example/exampledb/idp/summary                           | 2020-08-03T20:57:06+0000 | 2021-09-13T20:59:18+0000 | 5          | 61982055    | 7776000         | /opt/Testing-test/var/lib/Testing-test_example/frozen | 100000         |
+| siem-Testing-test-indexer-01320.node.ad1.us-example-domain-1 | ids                   | /opt/Testing-test/var/lib/Testing-test_example/Testing-test_warm/ids/summary                   | 2021-08-02T18:10:30+0000 | 2021-09-13T21:01:24+0000 | 73         | 345470038   | 7776000         | /opt/Testing-test/var/lib/Testing-test_example/frozen | 250000         |
+
+# Mappings to applicable control families:
+
+### **CSA Cloud Controls Matrix v4 Groups**
+
+### DSP-16
+
+Data Retention and Deletion - Data retention, archiving and deletion is managed in accordance with business requirements, applicable laws and regulations.
+
+### **CMMC Groups**
+
+### AM.3.036
+
+Define procedures for the handling of CUI data.
+
+### **MITRE Enterprise ATT&CK v8.2 Groups**
+
+### T1070
+
+Indicator Removal on Host - Adversaries may delete or alter generated artifacts on a host system, including logs or captured files such as quarantined malware. Locations and format of logs are platform or product-specific, however standard operating system logs are captured as Windows events or Linux/macOS files such as Bash History and /var/log/*.
+
+### T1070.001
+
+Clear Windows Event Logs - Adversaries may clear Windows Event Logs to hide the activity of an intrusion. Windows Event Logs are a record of a computer's alerts and notifications. There are three system-defined sources of events: System, Application, and Security, with five event types: Error, Warning, Information, Success Audit, and Failure Audit.
+
+### T1070.002
+
+Clear Linux or Mac System Logs - Adversaries may clear system logs to hide evidence of an intrusion. macOS and Linux both keep track of system or user-initiated actions via system logs. The majority of native system logging is stored under the /var/log/ directory. Subfolders in this directory categorize logs by their related functions.
