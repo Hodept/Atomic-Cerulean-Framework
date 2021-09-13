@@ -10,6 +10,50 @@ ADMon and LDAP Mon
 
 
 
+| TargetIP      | _time                        | host                                  | hosttype                 | region       | role    | uid                                                 |
+| ------------- | ---------------------------- | ------------------------------------- | ------------------------ | ------------ | ------- | --------------------------------------------------- |
+| 10.160.4.200  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host13-mio  | inventory.example.device | us-example-1 | mio     | example.example.example.example-chassis7-host1-mio  |
+| 10.0.5.23     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host12-wic2 | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis6-host2-wic2 |
+| 10.0.5.21     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host12-wic1 | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis6-host2-wic1 |
+| 10.160.4.207  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host12-mio  | inventory.example.device | us-example-1 | mio     | example.example.example.example-chassis6-host2-mio  |
+| 10.0.5.55     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host11-wic2 | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis6-host1-wic2 |
+| 10.0.5.53     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host11-wic1 | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis6-host1-wic1 |
+| 10.160.4.199  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host11-mio  | inventory.example.device | us-example-1 | mio     | example.example.example.example-chassis6-host1-mio  |
+| 10.0.5.19     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host10-wic2 | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis5-host2-wic2 |
+| 10.0.5.17     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host10-wic1 | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis5-host2-wic1 |
+| 10.160.4.206  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host10-mio  | inventory.example.device | us-example-1 | mio     | example.example.example.example-chassis5-host2-mio  |
+| 10.0.5.51     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host9-wic2  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis5-host1-wic2 |
+| 10.0.5.49     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host9-wic1  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis5-host1-wic1 |
+| 10.160.4.198  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host9-mio   | inventory.example.device | us-example-1 | mio     | example.example.example.example-chassis5-host1-mio  |
+| 10.0.5.15     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host8-wic2  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis4-host2-wic2 |
+| 10.0.5.13     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host8-wic1  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis4-host2-wic1 |
+| 10.160.4.205  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host8-mio   | inventory.example.device | us-example-1 | mio     | example.example.example.example-chassis4-host2-mio  |
+| 10.0.5.47     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host7-wic2  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis4-host1-wic2 |
+| 10.0.5.45     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host7-wic1  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis4-host1-wic1 |
+| 10.160.4.197  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host7-mio   | inventory.example.device | us-example-1 | mio     | example.example.example.example-chassis4-host1-mio  |
+| 10.0.5.11     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host6-wic2  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis3-host2-wic2 |
+| 10.0.5.9      | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host6-wic1  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis3-host2-wic1 |
+| 10.160.4.204  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host6-mio   | inventory.example.device | us-example-1 | mio     | example.example.example.example-chassis3-host2-mio  |
+| 10.0.5.43     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host5-wic2  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis3-host1-wic2 |
+| 10.0.5.41     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host5-wic1  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis3-host1-wic1 |
+| 10.160.4.196  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host5-mio   | inventory.example.device | us-example-1 | mio     | example.example.example.example-chassis3-host1-mio  |
+| 10.0.5.7      | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host4-wic2  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis2-host2-wic2 |
+| 10.0.5.5      | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host4-wic1  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis2-host2-wic1 |
+| 10.160.4.203  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host4-mio   | inventory.example.device | us-example-1 | mio     | example.example.example.example-chassis2-host2-mio  |
+| 10.0.5.39     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host3-wic2  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis2-host1-wic2 |
+| 10.0.5.37     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host3-wic1  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis2-host1-wic1 |
+| 10.160.4.195  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host3-mio   | inventory.example.device | us-example-1 | mio     | example.example.example.example-chassis2-host1-mio  |
+| 10.0.5.3      | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host2-wic2  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis1-host2-wic2 |
+| 10.0.5.1      | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host2-wic1  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis1-host2-wic1 |
+| 10.160.4.202  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host2-mio   | inventory.example.device | us-example-1 | mio     | example.example.example.example-chassis1-host2-mio  |
+| 10.0.5.35     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host1-wic2  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis1-host1-wic2 |
+| 10.0.5.33     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host1-wic1  | inventory.example.device | us-example-1 | wic     | example.example.example.example-chassis1-host1-wic1 |
+| 10.160.4.194  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host1-mio   | inventory.example.device | us-example-1 | mio     | example.example.example.example-chassis1-host1-mio  |
+| 198.19.64.18  | 2020-10-06T20:12:42.000+0000 | regional.example.host-r24-u1          | inventory.example.device | us-example-1 | utility | example.example.example.example-rack20-utility1     |
+| 198.18.128.87 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r24             | inventory.example.device | us-example-1 | tor     | example.example.example.example-rack20-tor1         |
+
+
+
 Identities look up 
 
 | ldapsearch domain=default search="(&(samAccountType=805306368))" attrs="accountExpires, co, department, displayName, distinguishedName, givenName, l, mail, mobile, manager, memberOf, personalTitle, sAMAccountName, sn, st, telephoneNumber, userAccountControl, whenCreated" 
