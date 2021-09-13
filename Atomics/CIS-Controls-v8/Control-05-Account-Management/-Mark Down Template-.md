@@ -1,82 +1,67 @@
-# Title / Name
+# CIS Control 3 - Data Protection
 
-## [Link-to-Control-language](Link_Here)
+## [CIS Controls v8 - (153)]([CIS Controls Navigator](https://www.cisecurity.org/controls/cis-controls-navigator/))
 
-> Definition Block
+> Develop processes and technical controls to identify, classify, securely handle, retain, and dispose of data.
+
+## 3.4 [Enforce Data Retention](https://www.cisecurity.org/controls/cis-controls-navigator/#collapse-a16)
+
+> Retain data according to the enterprise's data management process. Data retention must include both minimum and maximum timelines.
 
 ## Atomic Tests
 
-- [Atomic Test #1 - Decode base64 Data into Script](#atomic-test-1---decode-base64-data-into-script)
+- Atomic Test #1 - Splunk Data Retention Policy
 
-- [Atomic Test #2 - Execute base64-encoded PowerShell](#atomic-test-2---execute-base64-encoded-powershell)
-
-## Atomic Test #1 - Name
+## Atomic Test #1 - Splunk Data Retention Policy
 
 ### Description
 
-Upon successful execution, sh will execute art.sh, which is a base64 encoded command, that stdouts `echo Hello from the Atomic Red Team`.
+The indexer stores indexed data in directories called **[buckets](https://docs.splunk.com/Splexicon:Bucket "Splexicon:Bucket")**. Buckets go through four stages of retirement. When indexed data reaches the final, frozen state, the indexer removes it from the index. You can configure the indexer to archive the data when it freezes, instead of deleting it entirely. See ["Archive indexed data"](http://docs.splunk.com/Documentation/Splunk/8.2.2/Indexer/Automatearchiving) for details.
 
-#### **Supported Platforms:** macOS, Linux
+You can use the age of data to determine when a bucket gets rolled to frozen. When the most recent data in a particular bucket reaches the configured age, the entire bucket is rolled.
 
-#### Attack Commands: Run with `sh`!
+#### **Supported Platforms:** Splunk
 
-```sh
-sh -c "echo ZWNobyBIZWxsbyBmcm9tIHRoZSBBdG9taWMgUmVkIFRlYW0= > /tmp/encoded.dat"
-cat /tmp/encoded.dat | base64 -d > /tmp/art.sh
-chmod +x /tmp/art.sh
-/tmp/art.sh
+#### Evidence Commands: Run with SPL [(**Splunk's Search Processing Language**)]((https://www.splunk.com/en_us/resources/search-processing-language.html))
+
+```SPL
+| rest /services/data/indexes 
+| where disabled = 0 
+| search NOT title = "_*" 
+| eval currentDBSizeGB = round( currentDBSizeMB / 1024) 
+| where currentDBSizeGB > 0 
+| table splunk_server title summaryHomePath_expanded minTime maxTime currentDBSizeGB totalEventCount frozenTimePeriodInSecs coldToFrozenDir maxTotalDataSizeMB 
+| rename minTime AS earliest maxTime AS latest summaryHomePath_expanded AS index_path currentDBSizeGB AS index_size totalEventCount AS event_cnt frozenTimePeriodInSecs AS index_retention coldToFrozenDir AS index_path_frozen maxTotalDataSizeMB AS index_size_max title AS index
 ```
 
-## Atomic Test #2 - Execute base64-encoded PowerShell
+## Example Output
 
-### Description
+**<u>Disclaimer:</u>** This example output should be reviewed as a means to understand what the body of evidence auditors would expect to see when reviewing a control. This example should be viewed through such lense and NOT as an example of what will be accepted by all auditors in every circumstance.
 
-Creates base64-encoded PowerShell code and executes it. This is used by numerous adversaries and malicious tools.
+# Mappings to applicable control families:
 
-Upon successful execution, powershell will execute an encoded command and stdout default is "Write-Host "Hey, Atomic!"
+### **CSA Cloud Controls Matrix v4 Groups**
 
-### **Supported Platforms:** Windows
+### DSP-16
 
-#### Inputs:
+Data Retention and Deletion - Data retention, archiving and deletion is managed in accordance with business requirements, applicable laws and regulations.
 
-| Name               | Description                  | Type   | Default Value             |
-| ------------------ | ---------------------------- | ------ | ------------------------- |
-| powershell_command | PowerShell command to encode | String | Write-Host "Hey, Atomic!" |
+### **CMMC Groups**
 
-#### Attack Commands: Run with `powershell`!
+### AM.3.036
 
-```powershell
-$OriginalCommand = '#{powershell_command}'
-$Bytes = [System.Text.Encoding]::Unicode.GetBytes($OriginalCommand)
-$EncodedCommand =[Convert]::ToBase64String($Bytes)
-$EncodedCommand
-powershell.exe -EncodedCommand $EncodedCommand
-```
+Define procedures for the handling of CUI data.
 
-#### **Supported Platforms:** Windows
+### **MITRE Enterprise ATT&CK v8.2 Groups**
 
-#### Inputs:
+### T1070
 
-| Name                   | Description                                    | Type   | Default Value                                  |
-| ---------------------- | ---------------------------------------------- | ------ | ---------------------------------------------- |
-| registry_key_storage   | Windows Registry Key to store code             | String | HKCU:Software\Microsoft\Windows\CurrentVersion |
-| powershell_command     | PowerShell command to encode                   | String | Write-Host "Hey, Atomic!"                      |
-| registry_entry_storage | Windows Registry entry to store code under key | String | Debug                                          |
+Indicator Removal on Host - Adversaries may delete or alter generated artifacts on a host system, including logs or captured files such as quarantined malware. Locations and format of logs are platform or product-specific, however standard operating system logs are captured as Windows events or Linux/macOS files such as Bash History and /var/log/*.
 
-#### Attack Commands: Run with `powershell`!
+### T1070.001
 
-```powershell
-$OriginalCommand = '#{powershell_command}'
-$Bytes = [System.Text.Encoding]::Unicode.GetBytes($OriginalCommand)
-$EncodedCommand =[Convert]::ToBase64String($Bytes)
-$EncodedCommand
+Clear Windows Event Logs - Adversaries may clear Windows Event Logs to hide the activity of an intrusion. Windows Event Logs are a record of a computer's alerts and notifications. There are three system-defined sources of events: System, Application, and Security, with five event types: Error, Warning, Information, Success Audit, and Failure Audit.
 
-Set-ItemProperty -Force -Path #{registry_key_storage} -Name #{registry_entry_storage} -Value $EncodedCommand
-powershell.exe -Command "IEX ([Text.Encoding]::UNICODE.GetString([Convert]::FromBase64String((gp #{registry_key_storage} #{registry_entry_storage}).#{registry_entry_storage})))"
-```
+### T1070.002
 
-#### Cleanup Commands:
-
-```powershell
-Remove-ItemProperty -Force -ErrorAction Ignore -Path #{registry_key_storage} -Name #{registry_entry_storage}
-```
+Clear Linux or Mac System Logs - Adversaries may clear system logs to hide evidence of an intrusion. macOS and Linux both keep track of system or user-initiated actions via system logs. The majority of native system logging is stored under the /var/log/ directory. Subfolders in this directory categorize logs by their related functions.
