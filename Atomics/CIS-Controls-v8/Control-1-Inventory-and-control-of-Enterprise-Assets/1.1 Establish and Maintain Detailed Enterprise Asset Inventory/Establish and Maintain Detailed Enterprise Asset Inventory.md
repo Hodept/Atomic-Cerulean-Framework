@@ -10,83 +10,157 @@
 
 ## Atomic Tests
 
-- [Atomic Test #1 - Splunk Ad-Mon](#Atomic Test #1 - Splunk Ad-Mon)
+- [Atomic Test #1 - Splunk LDAPSearch](# Atomic Test #1 - Splunk LDAPSearch)
 
-- [Atomic Test #2 - Execute base64-encoded PowerShell](#atomic-test-2---execute-base64-encoded-powershell)
-
-## Atomic Test #1 - Splunk Ad-Mon
+## Atomic Test #1 - Splunk LDAPSearch
 
 ### Description
 
-You can configure AD monitoring to watch for changes to your Active Directory forest and collect user and machine metadata. You can use this feature combined with dynamic list lookups to decorate or modify events with any information available in AD. See [About lookups](http://docs.splunk.com/Documentation/SplunkCloud/latest/Knowledge/Aboutlookupsandfieldactions) in the *Knowledge Manager Manual*.
+You can configure Splunk to watch for changes to your LDAP directory and collect user and machine metadata. You can use this feature combined with dynamic list lookups to decorate or modify events with any information available in LDAP. See [About lookups](http://docs.splunk.com/Documentation/SplunkCloud/latest/Knowledge/Aboutlookupsandfieldactions) in the *Knowledge Manager Manual*.
 
-After you configure Splunk Enterprise to monitor your Active Directory, it takes a baseline snapshot of the AD schema. It uses this snapshot to establish a starting point for monitoring.
+After you configure Splunk Enterprise to monitor LDAP, it takes a baseline snapshot of the AD schema. It uses this snapshot to establish a starting point for monitoring.
 
-The AD monitoring input runs as a separate process called `splunk-admon.exe`. It runs once for every Active Directory monitoring input you define in Splunk Enterprise.
+[The ldapsearch command - Splunk Documentation](https://docs.splunk.com/Documentation/SA-LdapSearch/3.0.3/User/Theldapsearchcommand)
 
-[Monitor Active Directory - Splunk Documentation](https://docs.splunk.com/Documentation/SplunkCloud/8.2.2107/Data/MonitorActiveDirectory)
-
-#### **Supported Platforms:** Windows
+#### **Supported Platforms:** Linux
 
 #### Evidence Commands: Run with SPL [(**Splunk's Search Processing Language**)]((https://www.splunk.com/en_us/resources/search-processing-language.html))
 
-```sh
-sh -c "echo ZWNobyBIZWxsbyBmcm9tIHRoZSBBdG9taWMgUmVkIFRlYW0= > /tmp/encoded.dat"
-cat /tmp/encoded.dat | base64 -d > /tmp/art.sh
-chmod +x /tmp/art.sh
-/tmp/art.sh
+```SPL
+| ldapsearch domain=default search="(&(objectClass=computer))" attrs="distinguishedName, dNSHostName, managedBy, sAMAccountName" 
+| rex max_match=5 field=distinguishedName "OU=(?<dn_parsed>[^,]+)" 
+| eval nt_host=replace(sAMAccountName, "\$", ""), dns='dNSHostName', owner='managedBy', bunit_split=split(dn, ","), category=lower(replace(mvjoin(dn_parsed, "|"), " ", "_")), priority=case(match(category, "domain_controller|exchange|citrix"), "critical", match(category, "server|disabled"), "high", match(category, "workstation|desktop|mobile|laptop"), "medium", category IN ("staging", "test"), "low", 1==1, "unknown"), is_expected=if(priority IN ("critical", "high"), "true", "false") 
+| rex field=bunit_split "(OU|CN)=(?<bunit>.+)" 
+| table ip, mac, nt_host, dns, owner, priority, lat, long, city, country, bunit, category, pci_domain, is_expected, should_timesync, should_update, requires_av 
+| outputlookup AD_Assets_LDAP
 ```
 
-## Atomic Test #2 - Execute base64-encoded PowerShell
+## 
 
-### Description
+## Example Output
 
-Creates base64-encoded PowerShell code and executes it. This is used by numerous adversaries and malicious tools.
+**<u>Disclaimer:</u>** This example output should be reviewed as a means to understand what the body of evidence auditors would expect to see when reviewing a control.   This example should be viewed through such lense and NOT as an example of what will be accepted by all auditors in every circumstance.  
 
-Upon successful execution, powershell will execute an encoded command and stdout default is "Write-Host "Hey, Atomic!"
 
-### **Supported Platforms:** Windows
 
-#### Inputs:
+| TargetIP     | _time                        | host                                  | hosttype                 | region       | role | uid                                                 |
+| ------------ | ---------------------------- | ------------------------------------- | ------------------------ | ------------ | ---- | --------------------------------------------------- |
+| 10.160.4.200 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host13-mio  | inventory.example.device | us-example-1 | mio  | example.example.example.example-chassis7-host1-mio  |
+| 10.0.5.23    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host12-wic2 | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis6-host2-wic2 |
+| 10.0.5.21    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host12-wic1 | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis6-host2-wic1 |
+| 10.160.4.207 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host12-mio  | inventory.example.device | us-example-1 | mio  | example.example.example.example-chassis6-host2-mio  |
+| 10.0.5.55    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host11-wic2 | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis6-host1-wic2 |
+| 10.0.5.53    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host11-wic1 | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis6-host1-wic1 |
+| 10.160.4.199 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host11-mio  | inventory.example.device | us-example-1 | mio  | example.example.example.example-chassis6-host1-mio  |
+| 10.0.5.19    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host10-wic2 | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis5-host2-wic2 |
+| 10.0.5.17    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host10-wic1 | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis5-host2-wic1 |
+| 10.160.4.206 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host10-mio  | inventory.example.device | us-example-1 | mio  | example.example.example.example-chassis5-host2-mio  |
+| 10.0.5.51    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host9-wic2  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis5-host1-wic2 |
+| 10.0.5.49    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host9-wic1  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis5-host1-wic1 |
+| 10.160.4.198 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host9-mio   | inventory.example.device | us-example-1 | mio  | example.example.example.example-chassis5-host1-mio  |
+| 10.0.5.15    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host8-wic2  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis4-host2-wic2 |
+| 10.0.5.13    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host8-wic1  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis4-host2-wic1 |
+| 10.160.4.205 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host8-mio   | inventory.example.device | us-example-1 | mio  | example.example.example.example-chassis4-host2-mio  |
+| 10.0.5.47    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host7-wic2  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis4-host1-wic2 |
+| 10.0.5.45    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host7-wic1  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis4-host1-wic1 |
+| 10.160.4.197 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host7-mio   | inventory.example.device | us-example-1 | mio  | example.example.example.example-chassis4-host1-mio  |
+| 10.0.5.11    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host6-wic2  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis3-host2-wic2 |
+| 10.0.5.9     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host6-wic1  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis3-host2-wic1 |
+| 10.160.4.204 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host6-mio   | inventory.example.device | us-example-1 | mio  | example.example.example.example-chassis3-host2-mio  |
+| 10.0.5.43    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host5-wic2  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis3-host1-wic2 |
+| 10.0.5.41    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host5-wic1  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis3-host1-wic1 |
+| 10.160.4.196 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host5-mio   | inventory.example.device | us-example-1 | mio  | example.example.example.example-chassis3-host1-mio  |
+| 10.0.5.7     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host4-wic2  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis2-host2-wic2 |
+| 10.0.5.5     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host4-wic1  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis2-host2-wic1 |
+| 10.160.4.203 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host4-mio   | inventory.example.device | us-example-1 | mio  | example.example.example.example-chassis2-host2-mio  |
+| 10.0.5.39    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host3-wic2  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis2-host1-wic2 |
+| 10.0.5.37    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host3-wic1  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis2-host1-wic1 |
+| 10.160.4.195 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host3-mio   | inventory.example.device | us-example-1 | mio  | example.example.example.example-chassis2-host1-mio  |
+| 10.0.5.3     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host2-wic2  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis1-host2-wic2 |
+| 10.0.5.1     | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host2-wic1  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis1-host2-wic1 |
+| 10.160.4.202 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host2-mio   | inventory.example.device | us-example-1 | mio  | example.example.example.example-chassis1-host2-mio  |
+| 10.0.5.35    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host1-wic2  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis1-host1-wic2 |
+| 10.0.5.33    | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host1-wic1  | inventory.example.device | us-example-1 | wic  | example.example.example.example-chassis1-host1-wic1 |
+| 10.160.4.194 | 2020-10-06T20:12:42.000+0000 | regional.example.host-r25-host1-mio   | inventory.example.device | us-example-1 | mio  | example.example.example.example-chassis1-host1-mio  |
 
-| Name               | Description                  | Type   | Default Value             |
-| ------------------ | ---------------------------- | ------ | ------------------------- |
-| powershell_command | PowerShell command to encode | String | Write-Host "Hey, Atomic!" |
+# 
 
-#### Attack Commands: Run with `powershell`!
+# Mappings to applicable control families:
 
-```powershell
-$OriginalCommand = '#{powershell_command}'
-$Bytes = [System.Text.Encoding]::Unicode.GetBytes($OriginalCommand)
-$EncodedCommand =[Convert]::ToBase64String($Bytes)
-$EncodedCommand
-powershell.exe -EncodedCommand $EncodedCommand
-```
+### **CSA Cloud Controls Matrix v4 Groups**
 
-#### **Supported Platforms:** Windows
+### UEM-04
 
-#### Inputs:
+Endpoint Inventory - Maintain an inventory of all endpoints used to store and access company data.
 
-| Name                   | Description                                    | Type   | Default Value                                  |
-| ---------------------- | ---------------------------------------------- | ------ | ---------------------------------------------- |
-| registry_key_storage   | Windows Registry Key to store code             | String | HKCU:Software\Microsoft\Windows\CurrentVersion |
-| powershell_command     | PowerShell command to encode                   | String | Write-Host "Hey, Atomic!"                      |
-| registry_entry_storage | Windows Registry entry to store code under key | String | Debug                                          |
+### **CMMC Groups**
 
-#### Attack Commands: Run with `powershell`!
+### CM.2.061
 
-```powershell
-$OriginalCommand = '#{powershell_command}'
-$Bytes = [System.Text.Encoding]::Unicode.GetBytes($OriginalCommand)
-$EncodedCommand =[Convert]::ToBase64String($Bytes)
-$EncodedCommand
+Establish and maintain baseline configurations and inventories of organizational systems (including hardware, software, firmware, and documentation) throughout the respective system development life cycles.
 
-Set-ItemProperty -Force -Path #{registry_key_storage} -Name #{registry_entry_storage} -Value $EncodedCommand
-powershell.exe -Command "IEX ([Text.Encoding]::UNICODE.GetString([Convert]::FromBase64String((gp #{registry_key_storage} #{registry_entry_storage}).#{registry_entry_storage})))"
-```
+### **MITRE Enterprise ATT&CK v8.2 Groups**
 
-#### Cleanup Commands:
+### T1200
 
-```powershell
-Remove-ItemProperty -Force -ErrorAction Ignore -Path #{registry_key_storage} -Name #{registry_entry_storage}
-```
+Hardware Additions - Adversaries may introduce computer accessories, computers, or networking hardware into a system or network that can be used as a vector to gain access. While public references of usage by APT groups are scarce, many penetration testers leverage hardware additions for initial access. Commercial and open source products are leveraged with capabilities such as passive network tapping, man-in-the middle encryption breaking, keystroke injection, kernel memory reading via DMA, adding new wireless access to an existing network, and others.
+
+### **NIST CSF Groups**
+
+### ID.AM-1
+
+Physical devices and systems within the organization are inventoried
+
+### PR.DS-3
+
+Assets are formally managed throughout removal, transfers, and disposition
+
+### **NIST SP 800-171 Groups**
+
+### 3.1.20
+
+Verify and control/limit connections to and use of external systems.
+
+### 3.1.18
+
+Control connection of mobile devices.
+
+### 3.12.4
+
+Develop, document, and periodically update system security plans that describe system boundaries, system environments of operation, how security requirements are implemented, and the relationships with or connections to other systems.
+
+### **NIST SP 800-53 Revision 5 Low Baseline Groups**
+
+### CM-8
+
+System Component Inventory
+
+### **HIPAA Groups**
+
+### 164.310(d)(2)(iii)
+
+Accountability - Maintain a record of the movements of hardware and electronic media and any person responsible therefore.
+
+### **PCI v3.2.1 Groups**
+
+### 2.4
+
+Maintain an inventory of system components that are in scope for PCI DSS.
+
+### 9.9.1
+
+Maintain an up-to-date list of devices. The list should include the following: • Make, model of device • Location of device (for example, the address of the site or facility where the device is located) • Device serial number or other method of unique identification.
+
+### 11.1.1
+
+Maintain an inventory of authorized wireless access points including a documented business justification.
+
+### **SOC 2 Groups**
+
+### CC6.1
+
+Identifies and Manages the Inventory of Information Assets - The entity identifies, inventories, classifies, and manages information assets.
+
+### CC3.2
+
+Identifies and Assesses Criticality of Information Assets and Identifies Threats and Vulnerabilities - The entity's risk identification and assessment process includes (1) identifying information assets, including physical devices and systems, virtual devices, software, data and data flows, external information systems, and organizational roles; (2) assessing the criticality of those information assets; (3) identifying the threats to the assets from intentional (including malicious) and unintentional acts and environmental events; and (4) identifying the vulnerabilities of the identified assets.
