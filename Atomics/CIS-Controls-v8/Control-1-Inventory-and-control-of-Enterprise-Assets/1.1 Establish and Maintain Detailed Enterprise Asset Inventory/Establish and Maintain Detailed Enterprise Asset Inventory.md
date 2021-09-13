@@ -4,21 +4,31 @@
 
 > Actively manage (inventory, track, and correct) all enterprise assets (end-user devices, including portable and mobile; network devices; non-computing/Internet of Things (IoT) devices; and servers) connected to the infrastructure physically, virtually, remotely, and those within cloud environments, to accurately know the totality of assets that need to be monitored and protected within the enterprise. This will also support identifying unauthorized and unmanaged assets to remove or remediate.
 
+## 1.1 [Establish and Maintain Detailed Enterprise Asset Inventory](https://www.cisecurity.org/controls/cis-controls-navigator/#collapse-a1)
+
+> Establish and maintain an accurate, detailed, and up-to-date inventory of all enterprise assets with the potential to store or process data, to include: end-user devices (including portable and mobile), network devices, non-computing/IoT devices, and servers. Ensure the inventory records the network address (if static), hardware address, machine name, enterprise asset owner, department for each asset, and whether the asset has been approved to connect to the network. For mobile end-user devices,MDM type tools can support this process, where appropriate. This inventory includes assetsconnected to the infrastructure physically, virtually, remotely, and those within cloud environments. Additionally, it includes assets that are regularly connected to the enterprise's network infrastructure, even if they are not under control of the enterprise. Review and update the inventory of all enterprise assets bi-annually, or more frequently.
+
 ## Atomic Tests
 
-- [Atomic Test #1 - Decode base64 Data into Script](#atomic-test-1---decode-base64-data-into-script)
+- [Atomic Test #1 - Splunk Ad-Mon](#Atomic Test #1 - Splunk Ad-Mon)
 
 - [Atomic Test #2 - Execute base64-encoded PowerShell](#atomic-test-2---execute-base64-encoded-powershell)
 
-## Atomic Test #1 - Name
+## Atomic Test #1 - Splunk Ad-Mon
 
 ### Description
 
-Upon successful execution, sh will execute art.sh, which is a base64 encoded command, that stdouts `echo Hello from the Atomic Red Team`.
+You can configure AD monitoring to watch for changes to your Active Directory forest and collect user and machine metadata. You can use this feature combined with dynamic list lookups to decorate or modify events with any information available in AD. See [About lookups](http://docs.splunk.com/Documentation/SplunkCloud/latest/Knowledge/Aboutlookupsandfieldactions) in the *Knowledge Manager Manual*.
 
-#### **Supported Platforms:** macOS, Linux
+After you configure Splunk Enterprise to monitor your Active Directory, it takes a baseline snapshot of the AD schema. It uses this snapshot to establish a starting point for monitoring.
 
-#### Attack Commands: Run with `sh`!
+The AD monitoring input runs as a separate process called `splunk-admon.exe`. It runs once for every Active Directory monitoring input you define in Splunk Enterprise.
+
+[Monitor Active Directory - Splunk Documentation](https://docs.splunk.com/Documentation/SplunkCloud/8.2.2107/Data/MonitorActiveDirectory)
+
+#### **Supported Platforms:** Windows
+
+#### Evidence Commands: Run with SPL [(**Splunk's Search Processing Language**)]((https://www.splunk.com/en_us/resources/search-processing-language.html))
 
 ```sh
 sh -c "echo ZWNobyBIZWxsbyBmcm9tIHRoZSBBdG9taWMgUmVkIFRlYW0= > /tmp/encoded.dat"
