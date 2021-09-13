@@ -54,7 +54,16 @@ ADMon and LDAP Mon
 
 ----------------------------------
 
-| rest /services/data/indexes | where disabled = 0 | search NOT title = "_*" | eval currentDBSizeGB = round( currentDBSizeMB / 1024) | where currentDBSizeGB > 0 | table splunk_server title summaryHomePath_expanded minTime maxTime currentDBSizeGB totalEventCount frozenTimePeriodInSecs coldToFrozenDir maxTotalDataSizeMB | rename minTime AS earliest maxTime AS latest summaryHomePath_expanded AS index_path currentDBSizeGB AS index_size totalEventCount AS event_cnt frozenTimePeriodInSecs AS index_retention coldToFrozenDir AS index_path_frozen maxTotalDataSizeMB AS index_size_max title AS index
+| rest /services/data/indexes 
+| where disabled = 0 
+| search NOT title = "_*" 
+| eval currentDBSizeGB = round( currentDBSizeMB / 1024) 
+| where currentDBSizeGB > 0 
+| table splunk_server title summaryHomePath_expanded minTime maxTime currentDBSizeGB totalEventCount frozenTimePeriodInSecs coldToFrozenDir maxTotalDataSizeMB 
+| rename minTime AS earliest maxTime AS latest summaryHomePath_expanded AS index_path currentDBSizeGB AS index_size totalEventCount AS event_cnt frozenTimePeriodInSecs AS index_retention coldToFrozenDir AS index_path_frozen maxTotalDataSizeMB AS index_size_max title AS index
+
+
+
 
 | Testing-test_server                                          | index                 | index_path                                                                                     | earliest                 | latest                   | index_size | event_cnt   | index_retention | index_path_frozen                                     | index_size_max |
 | ------------------------------------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------- | ------------------------ | ------------------------ | ---------- | ----------- | --------------- | ----------------------------------------------------- | -------------- |
