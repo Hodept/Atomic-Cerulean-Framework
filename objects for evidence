@@ -78,3 +78,12 @@ sourcetype=zeek:ssl
 index=zeek
 disabled = 0
 sourcetype=zeek:conn
+
+
+
+
+#open	2021-09-14-17-00-00
+#fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	proto	service	duration	orig_bytes	resp_bytes	conn_state	local_orig	local_resp	missed_bytes	history	orig_pkts	orig_ip_bytes	resp_pkts	resp_ip_bytes	tunnel_parents
+#types	time	string	addr	port	addr	port	enum	string	interval	count	count	string	bool	bool	count	string	count	count	count	count	set[string]
+1631638789.979323	CaA1uS3ngzLWrXPJb9	xxx.xxx.xxx.xxx	37665	xxx.xxx.xxx.xxx	53	udp	dns	0.000272	0	256	SHR	T	Cd	0	0	2	312	-
+1631638789.995756	Cmv7T92na3mGx1vS8g	xxx.xxx.xxx.xxx	54470	xxx.xxx.xxx.xxx	53	udp	dns	0.000237	0	256	SHR	T	Cd	0	0	2	312
